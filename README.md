@@ -67,340 +67,340 @@ Use "./yap help <command>" for more information about a command
 2. You can then send HTTP GET requests with json objects in the request body and receive back a json object containing the 3 output levels:
 
     ```
-POST /parse
-
-{
-	"sentences": [
-		["כשעה", "נסיעה", "ממיאמי", ",", "נמצא", "מרכז", "הקניות", "הגדול", "הזה", ",", "שהוא", "למעשה", "מתחם", "של", "מאות", "חנויות", "ואאוטלטים", "."],
-		["מתחם", "קניות"]
-	]
-}
+    POST /parse
+    
+    {
+        "sentences": [
+            ["כשעה", "נסיעה", "ממיאמי", ",", "נמצא", "מרכז", "הקניות", "הגדול", "הזה", ",", "שהוא", "למעשה", "מתחם", "של", "מאות", "חנויות", "ואאוטלטים", "."],
+            ["מתחם", "קניות"]
+        ]
+    }
     ```
     
     Response:
     ```json
-[
     [
-        {
-            "token": 0,
-            "form": "כ",
-            "lemma": "כ",
-            "CPOS": "PREPOSITION",
-            "POS": "PREPOSITION",
-            "features": {},
-            "head": 6,
-            "dep": "prepmod"
-        },
-        {
-            "token": 0,
-            "form": "שעה",
-            "lemma": "שעה",
-            "CPOS": "NN",
-            "POS": "NN",
-            "features": {
-                "gen": "F",
-                "num": "S"
+        [
+            {
+                "token": 0,
+                "form": "כ",
+                "lemma": "כ",
+                "CPOS": "PREPOSITION",
+                "POS": "PREPOSITION",
+                "features": {},
+                "head": 6,
+                "dep": "prepmod"
             },
-            "head": 0,
-            "dep": "pobj"
-        },
-        {
-            "token": 1,
-            "form": "נסיעה",
-            "lemma": "נסיעה",
-            "CPOS": "NN",
-            "POS": "NN",
-            "features": {
-                "gen": "F",
-                "num": "S"
+            {
+                "token": 0,
+                "form": "שעה",
+                "lemma": "שעה",
+                "CPOS": "NN",
+                "POS": "NN",
+                "features": {
+                    "gen": "F",
+                    "num": "S"
+                },
+                "head": 0,
+                "dep": "pobj"
             },
-            "head": 1,
-            "dep": "nn"
-        },
-        {
-            "token": 2,
-            "form": "מ",
-            "lemma": "מ",
-            "CPOS": "PREPOSITION",
-            "POS": "PREPOSITION",
-            "features": {},
-            "head": 2,
-            "dep": "prepmod"
-        },
-        {
-            "token": 2,
-            "form": "מיאמי",
-            "lemma": "מיאמי",
-            "CPOS": "NNP",
-            "POS": "NNP",
-            "features": {},
-            "head": 3,
-            "dep": "pobj"
-        },
-        {
-            "token": 3,
-            "form": ",",
-            "lemma": "",
-            "CPOS": "yyCM",
-            "POS": "yyCM",
-            "features": {},
-            "head": 6,
-            "dep": "punct"
-        },
-        {
-            "token": 4,
-            "form": "נמצא",
-            "lemma": "נמצא",
-            "CPOS": "VB",
-            "POS": "VB",
-            "features": {
-                "gen": "M",
-                "num": "S",
-                "per": "3",
-                "tense": "PAST"
+            {
+                "token": 1,
+                "form": "נסיעה",
+                "lemma": "נסיעה",
+                "CPOS": "NN",
+                "POS": "NN",
+                "features": {
+                    "gen": "F",
+                    "num": "S"
+                },
+                "head": 1,
+                "dep": "nn"
             },
-            "head": -1,
-            "dep": "ROOT"
-        },
-        {
-            "token": 5,
-            "form": "מרכז",
-            "lemma": "מרכז",
-            "CPOS": "NNT",
-            "POS": "NNT",
-            "features": {
-                "gen": "M",
-                "num": "S"
+            {
+                "token": 2,
+                "form": "מ",
+                "lemma": "מ",
+                "CPOS": "PREPOSITION",
+                "POS": "PREPOSITION",
+                "features": {},
+                "head": 2,
+                "dep": "prepmod"
             },
-            "head": 6,
-            "dep": "subj"
-        },
-        {
-            "token": 6,
-            "form": "ה",
-            "lemma": "ה",
-            "CPOS": "DEF",
-            "POS": "DEF",
-            "features": {},
-            "head": 9,
-            "dep": "def"
-        },
-        {
-            "token": 6,
-            "form": "קניות",
-            "lemma": "קנייה",
-            "CPOS": "NN",
-            "POS": "NN",
-            "features": {
-                "gen": "F",
-                "num": "P"
+            {
+                "token": 2,
+                "form": "מיאמי",
+                "lemma": "מיאמי",
+                "CPOS": "NNP",
+                "POS": "NNP",
+                "features": {},
+                "head": 3,
+                "dep": "pobj"
             },
-            "head": 7,
-            "dep": "gobj"
-        },
-        {
-            "token": 7,
-            "form": "ה",
-            "lemma": "ה",
-            "CPOS": "DEF",
-            "POS": "DEF",
-            "features": {},
-            "head": 11,
-            "dep": "def"
-        },
-        {
-            "token": 7,
-            "form": "גדול",
-            "lemma": "גדול",
-            "CPOS": "JJ",
-            "POS": "JJ",
-            "features": {
-                "gen": "M",
-                "num": "S"
+            {
+                "token": 3,
+                "form": ",",
+                "lemma": "",
+                "CPOS": "yyCM",
+                "POS": "yyCM",
+                "features": {},
+                "head": 6,
+                "dep": "punct"
             },
-            "head": 7,
-            "dep": "amod"
-        },
-        {
-            "token": 8,
-            "form": "ה",
-            "lemma": "ה",
-            "CPOS": "DEF",
-            "POS": "DEF",
-            "features": {},
-            "head": 13,
-            "dep": "def"
-        },
-        {
-            "token": 8,
-            "form": "זה",
-            "lemma": "זה",
-            "CPOS": "PRP",
-            "POS": "PRP",
-            "features": {
-                "gen": "M",
-                "num": "S",
-                "per": "3"
+            {
+                "token": 4,
+                "form": "נמצא",
+                "lemma": "נמצא",
+                "CPOS": "VB",
+                "POS": "VB",
+                "features": {
+                    "gen": "M",
+                    "num": "S",
+                    "per": "3",
+                    "tense": "PAST"
+                },
+                "head": -1,
+                "dep": "ROOT"
             },
-            "head": 7,
-            "dep": "amod"
-        },
-        {
-            "token": 9,
-            "form": ",",
-            "lemma": "",
-            "CPOS": "yyCM",
-            "POS": "yyCM",
-            "features": {},
-            "head": 7,
-            "dep": "punct"
-        },
-        {
-            "token": 10,
-            "form": "ש",
-            "lemma": "ש",
-            "CPOS": "REL",
-            "POS": "REL",
-            "features": {},
-            "head": 7,
-            "dep": "rcmod"
-        },
-        {
-            "token": 10,
-            "form": "הוא",
-            "lemma": "הוא",
-            "CPOS": "PRP",
-            "POS": "PRP",
-            "features": {
-                "gen": "M",
-                "num": "S",
-                "per": "3"
+            {
+                "token": 5,
+                "form": "מרכז",
+                "lemma": "מרכז",
+                "CPOS": "NNT",
+                "POS": "NNT",
+                "features": {
+                    "gen": "M",
+                    "num": "S"
+                },
+                "head": 6,
+                "dep": "subj"
             },
-            "head": 18,
-            "dep": "subj"
-        },
-        {
-            "token": 11,
-            "form": "למעשה",
-            "lemma": "למעשה",
-            "CPOS": "RB",
-            "POS": "RB",
-            "features": {},
-            "head": 18,
-            "dep": "parataxis"
-        },
-        {
-            "token": 12,
-            "form": "מתחם",
-            "lemma": "מתחם",
-            "CPOS": "NN",
-            "POS": "NN",
-            "features": {
-                "gen": "M",
-                "num": "S"
+            {
+                "token": 6,
+                "form": "ה",
+                "lemma": "ה",
+                "CPOS": "DEF",
+                "POS": "DEF",
+                "features": {},
+                "head": 9,
+                "dep": "def"
             },
-            "head": 15,
-            "dep": "relcomp"
-        },
-        {
-            "token": 13,
-            "form": "של",
-            "lemma": "של",
-            "CPOS": "POS",
-            "POS": "POS",
-            "features": {},
-            "head": 18,
-            "dep": "posspmod"
-        },
-        {
-            "token": 14,
-            "form": "מאות",
-            "lemma": "מאה",
-            "CPOS": "CDT",
-            "POS": "CDT",
-            "features": {
-                "gen": "F",
-                "num": "P"
+            {
+                "token": 6,
+                "form": "קניות",
+                "lemma": "קנייה",
+                "CPOS": "NN",
+                "POS": "NN",
+                "features": {
+                    "gen": "F",
+                    "num": "P"
+                },
+                "head": 7,
+                "dep": "gobj"
             },
-            "head": 21,
-            "dep": "num"
-        },
-        {
-            "token": 15,
-            "form": "חנויות",
-            "lemma": "חנות",
-            "CPOS": "NN",
-            "POS": "NN",
-            "features": {
-                "gen": "F",
-                "num": "P"
+            {
+                "token": 7,
+                "form": "ה",
+                "lemma": "ה",
+                "CPOS": "DEF",
+                "POS": "DEF",
+                "features": {},
+                "head": 11,
+                "dep": "def"
             },
-            "head": 22,
-            "dep": "conj"
-        },
-        {
-            "token": 16,
-            "form": "ו",
-            "lemma": "ו",
-            "CPOS": "CONJ",
-            "POS": "CONJ",
-            "features": {},
-            "head": 19,
-            "dep": "gobj"
-        },
-        {
-            "token": 16,
-            "form": "אאוטלטים",
-            "lemma": "אאוטלטים",
-            "CPOS": "NN",
-            "POS": "NN",
-            "features": {
-                "gen": "F",
-                "num": "S"
+            {
+                "token": 7,
+                "form": "גדול",
+                "lemma": "גדול",
+                "CPOS": "JJ",
+                "POS": "JJ",
+                "features": {
+                    "gen": "M",
+                    "num": "S"
+                },
+                "head": 7,
+                "dep": "amod"
             },
-            "head": 22,
-            "dep": "conj"
-        },
-        {
-            "token": 17,
-            "form": ".",
-            "lemma": "",
-            "CPOS": "yyDOT",
-            "POS": "yyDOT",
-            "features": {},
-            "head": 6,
-            "dep": "punct"
-        }
-    ],
-    [
-        {
-            "token": 0,
-            "form": "מתחם",
-            "lemma": "מתחם",
-            "CPOS": "NNT",
-            "POS": "NNT",
-            "features": {
-                "gen": "M",
-                "num": "S"
+            {
+                "token": 8,
+                "form": "ה",
+                "lemma": "ה",
+                "CPOS": "DEF",
+                "POS": "DEF",
+                "features": {},
+                "head": 13,
+                "dep": "def"
             },
-            "head": -1,
-            "dep": "ROOT"
-        },
-        {
-            "token": 1,
-            "form": "קניות",
-            "lemma": "קנייה",
-            "CPOS": "NN",
-            "POS": "NN",
-            "features": {
-                "gen": "F",
-                "num": "P"
+            {
+                "token": 8,
+                "form": "זה",
+                "lemma": "זה",
+                "CPOS": "PRP",
+                "POS": "PRP",
+                "features": {
+                    "gen": "M",
+                    "num": "S",
+                    "per": "3"
+                },
+                "head": 7,
+                "dep": "amod"
             },
-            "head": 0,
-            "dep": "gobj"
-        }
+            {
+                "token": 9,
+                "form": ",",
+                "lemma": "",
+                "CPOS": "yyCM",
+                "POS": "yyCM",
+                "features": {},
+                "head": 7,
+                "dep": "punct"
+            },
+            {
+                "token": 10,
+                "form": "ש",
+                "lemma": "ש",
+                "CPOS": "REL",
+                "POS": "REL",
+                "features": {},
+                "head": 7,
+                "dep": "rcmod"
+            },
+            {
+                "token": 10,
+                "form": "הוא",
+                "lemma": "הוא",
+                "CPOS": "PRP",
+                "POS": "PRP",
+                "features": {
+                    "gen": "M",
+                    "num": "S",
+                    "per": "3"
+                },
+                "head": 18,
+                "dep": "subj"
+            },
+            {
+                "token": 11,
+                "form": "למעשה",
+                "lemma": "למעשה",
+                "CPOS": "RB",
+                "POS": "RB",
+                "features": {},
+                "head": 18,
+                "dep": "parataxis"
+            },
+            {
+                "token": 12,
+                "form": "מתחם",
+                "lemma": "מתחם",
+                "CPOS": "NN",
+                "POS": "NN",
+                "features": {
+                    "gen": "M",
+                    "num": "S"
+                },
+                "head": 15,
+                "dep": "relcomp"
+            },
+            {
+                "token": 13,
+                "form": "של",
+                "lemma": "של",
+                "CPOS": "POS",
+                "POS": "POS",
+                "features": {},
+                "head": 18,
+                "dep": "posspmod"
+            },
+            {
+                "token": 14,
+                "form": "מאות",
+                "lemma": "מאה",
+                "CPOS": "CDT",
+                "POS": "CDT",
+                "features": {
+                    "gen": "F",
+                    "num": "P"
+                },
+                "head": 21,
+                "dep": "num"
+            },
+            {
+                "token": 15,
+                "form": "חנויות",
+                "lemma": "חנות",
+                "CPOS": "NN",
+                "POS": "NN",
+                "features": {
+                    "gen": "F",
+                    "num": "P"
+                },
+                "head": 22,
+                "dep": "conj"
+            },
+            {
+                "token": 16,
+                "form": "ו",
+                "lemma": "ו",
+                "CPOS": "CONJ",
+                "POS": "CONJ",
+                "features": {},
+                "head": 19,
+                "dep": "gobj"
+            },
+            {
+                "token": 16,
+                "form": "אאוטלטים",
+                "lemma": "אאוטלטים",
+                "CPOS": "NN",
+                "POS": "NN",
+                "features": {
+                    "gen": "F",
+                    "num": "S"
+                },
+                "head": 22,
+                "dep": "conj"
+            },
+            {
+                "token": 17,
+                "form": ".",
+                "lemma": "",
+                "CPOS": "yyDOT",
+                "POS": "yyDOT",
+                "features": {},
+                "head": 6,
+                "dep": "punct"
+            }
+        ],
+        [
+            {
+                "token": 0,
+                "form": "מתחם",
+                "lemma": "מתחם",
+                "CPOS": "NNT",
+                "POS": "NNT",
+                "features": {
+                    "gen": "M",
+                    "num": "S"
+                },
+                "head": -1,
+                "dep": "ROOT"
+            },
+            {
+                "token": 1,
+                "form": "קניות",
+                "lemma": "קנייה",
+                "CPOS": "NN",
+                "POS": "NN",
+                "features": {
+                    "gen": "F",
+                    "num": "P"
+                },
+                "head": 0,
+                "dep": "gobj"
+            }
+        ]
     ]
-]
     ```
 
 ## License
