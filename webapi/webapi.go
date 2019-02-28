@@ -2,49 +2,52 @@ package webapi
 
 import (
 	"encoding/json"
-	"log"
-	"net/http"
 	"github.com/gonuts/commander"
 	"github.com/gonuts/flag"
 	"github.com/gorilla/mux"
-	"yap/nlp/format/lex"
-	"yap/nlp/types"
+	"log"
+	"net/http"
 	"strings"
 	"yap/app"
-	"yap/nlp/parser/joint"
-	"yap/nlp/format/lattice"
 	"yap/nlp/format/conll"
+	"yap/nlp/format/lattice"
+	"yap/nlp/format/lex"
+	"yap/nlp/parser/joint"
+	"yap/nlp/types"
 )
-
 
 var (
 	router *mux.Router
 )
 
 type Request struct {
-	Text string `json:text`
-	AmbLattice string `json:amb_lattice`
+	Text          string `json:text`
+	AmbLattice    string `json:amb_lattice`
 	DisambLattice string `json:disamb_lattice`
+}
+
+type ParseRequest struct {
+	Sentences []types.BasicSentence `json:sentences`
 }
 
 type Data struct {
 	MALattice string `json:"ma_lattice,omitempty"`
 	MDLattice string `json:"md_lattice,omitempty"`
-	DepTree string `json:"dep_tree,omitempty"`
-	Error error `json:"error,omitempty"`
+	DepTree   string `json:"dep_tree,omitempty"`
+	Error     error  `json:"error,omitempty"`
 }
 
 func HebrewMorphAnalyzerHandler(resp http.ResponseWriter, req *http.Request) {
 	request := Request{}
 	err := json.NewDecoder(req.Body).Decode(&request)
 	if err != nil {
-		data := Data { Error: err }
+		data := Data{Error: err}
 		respondWithJSON(resp, http.StatusBadRequest, data)
 		return
 	}
 	rawText := strings.Replace(request.Text, " ", "\n", -1)
 	maLattice := HebrewMorphAnalyzeRawSentences(rawText)
-	data := Data{ MALattice: maLattice }
+	data := Data{MALattice: maLattice}
 	respondWithJSON(resp, http.StatusOK, data)
 }
 
@@ -52,14 +55,14 @@ func MorphDisambiguatorHandler(resp http.ResponseWriter, req *http.Request) {
 	request := Request{}
 	err := json.NewDecoder(req.Body).Decode(&request)
 	if err != nil {
-		data := Data { Error: err }
+		data := Data{Error: err}
 		respondWithJSON(resp, http.StatusBadRequest, data)
 		return
 	}
 	ambLattice := strings.Replace(request.AmbLattice, "\\t", "\t", -1)
 	ambLattice = strings.Replace(ambLattice, "\\n", "\n", -1)
 	mdLattice := MorphDisambiguateLattices(ambLattice)
-	data := Data { MDLattice: mdLattice }
+	data := Data{MDLattice: mdLattice}
 	respondWithJSON(resp, http.StatusOK, data)
 }
 
@@ -67,14 +70,14 @@ func DepParserHandler(resp http.ResponseWriter, req *http.Request) {
 	request := Request{}
 	err := json.NewDecoder(req.Body).Decode(&request)
 	if err != nil {
-		result := Data { Error: err }
+		result := Data{Error: err}
 		respondWithJSON(resp, http.StatusBadRequest, result)
 		return
 	}
 	disambLattice := strings.Replace(request.DisambLattice, "\\t", "\t", -1)
 	disambLattice = strings.Replace(disambLattice, "\\n", "\n", -1)
 	depTree := DepParseDisambiguatedLattice(disambLattice)
-	data := Data { DepTree: depTree }
+	data := Data{DepTree: depTree}
 	respondWithJSON(resp, http.StatusOK, data)
 }
 
@@ -82,7 +85,7 @@ func HebrewPipelineHandler(resp http.ResponseWriter, req *http.Request) {
 	request := Request{}
 	err := json.NewDecoder(req.Body).Decode(&request)
 	if err != nil {
-		data := Data { Error: err }
+		data := Data{Error: err}
 		respondWithJSON(resp, http.StatusBadRequest, data)
 		return
 	}
@@ -90,7 +93,7 @@ func HebrewPipelineHandler(resp http.ResponseWriter, req *http.Request) {
 	maLattice := HebrewMorphAnalyzeRawSentences(rawText)
 	mdLattice := MorphDisambiguateLattices(maLattice)
 	depTree := DepParseDisambiguatedLattice(mdLattice)
-	data := Data { MALattice: maLattice, MDLattice: mdLattice, DepTree: depTree }
+	data := Data{MALattice: maLattice, MDLattice: mdLattice, DepTree: depTree}
 	respondWithJSON(resp, http.StatusOK, data)
 }
 
@@ -98,29 +101,59 @@ func HebrewJointHandler(resp http.ResponseWriter, req *http.Request) {
 	request := Request{}
 	err := json.NewDecoder(req.Body).Decode(&request)
 	if err != nil {
-		data := Data { Error: err }
+		data := Data{Error: err}
 		respondWithJSON(resp, http.StatusBadRequest, data)
 		return
 	}
 	rawText := strings.Replace(request.Text, " ", "\n", -1)
 	maLattice := HebrewMorphAnalyzeRawSentences(rawText)
 	depTree, mdLattice, _ := JointParseAmbiguousLattices(maLattice)
-	data := Data { MALattice: maLattice, MDLattice: mdLattice, DepTree: depTree }
+	data := Data{MALattice: maLattice, MDLattice: mdLattice, DepTree: depTree}
 	respondWithJSON(resp, http.StatusOK, data)
 }
 
-func respondWithJSON(resp http.ResponseWriter, code int, payload Data) {
+func HebrewIndexHandler(resp http.ResponseWriter, req *http.Request) {
+	respondWithJSON(resp, http.StatusOK, nil)
+}
+
+func HebrewParseHandler(resp http.ResponseWriter, req *http.Request) {
+	request := ParseRequest{}
+	err := json.NewDecoder(req.Body).Decode(&request)
+	if err != nil {
+		data := Data{Error: err}
+		respondWithJSON(resp, http.StatusBadRequest, data)
+		return
+	}
+	maLattice := HebrewMorphAnalyzeBasicSentences(request.Sentences)
+	depGraph := JointRawParseAmbiguousLattices(maLattice)
+
+	output := make([][]Node, len(depGraph))
+	for i, graph := range depGraph {
+		output[i] = GraphToNodes(graph)
+	}
+
+	respondWithJSON(resp, http.StatusOK, output)
+}
+
+func respondWithJSON(resp http.ResponseWriter, code int, payload interface{}) {
 	resp.Header().Set("Content-Type", "application/json")
 	resp.WriteHeader(code)
 	jsonPayload, err := json.Marshal(payload)
 	if err != nil {
-		errJson, _  := json.Marshal(err)
+		errJson, _ := json.Marshal(err)
 		resp.Write(errJson)
 	} else {
 		resp.Write(jsonPayload)
 	}
 }
 
+func loggingMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		log.Println(r.Method, r.RequestURI, r.RemoteAddr)
+
+		next.ServeHTTP(w, r)
+	})
+}
 
 func APIServerStartCmd() *commander.Command {
 	cmd := &commander.Command{
@@ -163,12 +196,20 @@ func StartAPIServer(cmd *commander.Command, args []string) error {
 	MorphDisambiguatorInitialize(cmd, args)
 	DepParserInitialize(cmd, args)
 	JointParserInitialize()
+
 	router = mux.NewRouter()
-	router.HandleFunc("/yap/heb/ma", HebrewMorphAnalyzerHandler)
-	router.HandleFunc("/yap/heb/md", MorphDisambiguatorHandler)
-	router.HandleFunc("/yap/heb/dep", DepParserHandler)
-	router.HandleFunc("/yap/heb/pipeline", HebrewPipelineHandler)
-	router.HandleFunc("/yap/heb/joint", HebrewJointHandler)
+	//router.HandleFunc("/yap/heb/ma", HebrewMorphAnalyzerHandler)
+	//router.HandleFunc("/yap/heb/md", MorphDisambiguatorHandler)
+	//router.HandleFunc("/yap/heb/dep", DepParserHandler)
+	//router.HandleFunc("/yap/heb/pipeline", HebrewPipelineHandler)
+	//router.HandleFunc("/yap/heb/joint", HebrewJointHandler)
+	router.HandleFunc("/", HebrewIndexHandler)
+	router.HandleFunc("/parse", HebrewParseHandler)
+	router.Use(loggingMiddleware)
+
+	log.Println()
+	log.Println("Server is ready at port 8000")
+
 	log.Fatal(http.ListenAndServe(":8000", router))
 	return nil
 }

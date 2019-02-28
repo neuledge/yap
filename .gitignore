@@ -47,3 +47,6 @@ oldlogs/
 
 # folders i don't want to see
 quiet/
+
+vendor/
+_vendor-*/
