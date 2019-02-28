@@ -64,7 +64,7 @@ Use "./yap help <command>" for more information about a command
     $ ./yap api
     ```
 
-2. You can then send HTTP GET requests with json objects in the request body and receive back a json object containing the 3 output levels:
+2. You can then send HTTP POST requests with json objects in the request body and receive back a json object with the parsed nodes:
 
     ```
     POST /parse
