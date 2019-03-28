@@ -17,7 +17,8 @@ import (
 )
 
 var (
-	router *mux.Router
+	router  *mux.Router
+	TagOnly bool
 )
 
 type Request struct {
@@ -135,6 +136,26 @@ func HebrewParseHandler(resp http.ResponseWriter, req *http.Request) {
 	respondWithJSON(resp, http.StatusOK, output)
 }
 
+func HebrewTagHandler(resp http.ResponseWriter, req *http.Request) {
+	request := ParseRequest{}
+	err := json.NewDecoder(req.Body).Decode(&request)
+	if err != nil {
+		data := Data{Error: err}
+		respondWithJSON(resp, http.StatusBadRequest, data)
+		return
+	}
+
+	maLattice := HebrewMorphAnalyzeBasicSentences(request.Sentences)
+	parsed := RawMorphDisambiguateLattices(maLattice)
+
+	output := make([][]Node, len(parsed))
+	for i, tokens := range parsed {
+		output[i] = TokensToNodes(tokens)
+	}
+
+	respondWithJSON(resp, http.StatusOK, output)
+}
+
 func respondWithJSON(resp http.ResponseWriter, code int, payload interface{}) {
 	resp.Header().Set("Content-Type", "application/json")
 	resp.WriteHeader(code)
@@ -177,6 +198,7 @@ listen to api requests
 	cmd.Flag.IntVar(&app.BeamSize, "beam", 64, "Beam size")
 	cmd.Flag.BoolVar(&app.UsePOP, "use_end_token", true, "Use end token (pop)")
 	cmd.Flag.BoolVar(&lattice.IGNORE_LEMMA, "nolemma", true, "Ignore lemmas")
+	cmd.Flag.BoolVar(&TagOnly, "tagonly", false, "No dependency parser")
 	//cmd.Flag.BoolVar(&conll.IGNORE_LEMMA, "conll_nolemma", true, "Ignore lemmas")
 	cmd.Flag.StringVar(&conll.WORD_TYPE, "conll_wordtype", "form", "Word type [form, lemma, lemma+f (=lemma if present else form)]")
 	cmd.Flag.StringVar(&app.MdParamFuncName, "md_param_func", "Funcs_Main_POS_Both_Prop", "MD param func types: ["+types.AllParamFuncNames+"]")
@@ -194,8 +216,10 @@ listen to api requests
 func StartAPIServer(cmd *commander.Command, args []string) error {
 	HebrewMorphAnalyazerInitialize(cmd, args)
 	MorphDisambiguatorInitialize(cmd, args)
-	DepParserInitialize(cmd, args)
-	JointParserInitialize()
+	if !TagOnly {
+		DepParserInitialize(cmd, args)
+		JointParserInitialize()
+	}
 
 	router = mux.NewRouter()
 	//router.HandleFunc("/yap/heb/ma", HebrewMorphAnalyzerHandler)
@@ -204,7 +228,10 @@ func StartAPIServer(cmd *commander.Command, args []string) error {
 	//router.HandleFunc("/yap/heb/pipeline", HebrewPipelineHandler)
 	//router.HandleFunc("/yap/heb/joint", HebrewJointHandler)
 	router.HandleFunc("/", HebrewIndexHandler)
-	router.HandleFunc("/parse", HebrewParseHandler)
+	router.HandleFunc("/tag", HebrewTagHandler)
+	if !TagOnly {
+		router.HandleFunc("/parse", HebrewParseHandler)
+	}
 	router.Use(loggingMiddleware)
 
 	log.Println()

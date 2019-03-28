@@ -20,10 +20,11 @@ RUN go build -o /bin/yap
 FROM golang:1.12
 WORKDIR /app
 
-COPY ./data ./data/
+COPY ./data/md_model_temp_i9.b64 ./data/
+COPY ./data/bgulex ./data/bgulex
 COPY ./conf ./conf/
 
 COPY --from=build /bin/yap ./yap
 
 EXPOSE 8000
-ENTRYPOINT ["./yap", "api"]
+ENTRYPOINT ["./yap", "api", "-tagonly"]

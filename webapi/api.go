@@ -12,8 +12,8 @@ type Node struct {
 	CPOS     string         `json:"CPOS"`
 	POS      string         `json:"POS"`
 	Features conll.Features `json:"features"`
-	Head     int            `json:"head"`
-	DepRel   string         `json:"dep"`
+	Head     int            `json:"head,omitempty"`
+	DepRel   string         `json:"dep,omitempty"`
 }
 
 func GraphToNodes(graph types.MorphDependencyGraph) []Node {
@@ -62,6 +62,25 @@ func GraphToNodes(graph types.MorphDependencyGraph) []Node {
 			Features: node.Features,
 			Head:     headID,
 			DepRel:   depRel,
+		}
+
+		sent[i] = row
+	}
+
+	return sent
+}
+
+func TokensToNodes(tokens []types.EMorpheme) []Node {
+	sent := make([]Node, len(tokens))
+
+	for i, token := range tokens {
+		row := Node{
+			Token:    token.TokenID - 1,
+			Form:     token.Form,
+			Lemma:    token.Lemma,
+			CPOS:     token.CPOS,
+			POS:      token.POS,
+			Features: token.Features,
 		}
 
 		sent[i] = row

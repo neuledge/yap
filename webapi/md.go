@@ -1,21 +1,21 @@
 package webapi
 
 import (
-	"github.com/gonuts/commander"
-	"yap/nlp/parser/disambig"
-	"yap/nlp/format/lattice"
-	"log"
-	"yap/util"
+	"bytes"
 	"fmt"
-	"yap/alg/search"
+	"github.com/gonuts/commander"
+	"log"
 	"strings"
-	"yap/app"
+	"sync"
+	"yap/alg/search"
 	"yap/alg/transition"
 	transitionmodel "yap/alg/transition/model"
-	nlp "yap/nlp/types"
+	"yap/app"
+	"yap/nlp/format/lattice"
 	"yap/nlp/format/mapping"
-	"bytes"
-	"sync"
+	"yap/nlp/parser/disambig"
+	nlp "yap/nlp/types"
+	"yap/util"
 )
 
 var (
@@ -30,11 +30,11 @@ func MorphDisambiguatorInitialize(cmd *commander.Command, args []string) {
 	}
 	var (
 		mdTrans transition.TransitionSystem
-		model *transitionmodel.AvgMatrixSparse = &transitionmodel.AvgMatrixSparse{}
+		model   *transitionmodel.AvgMatrixSparse = &transitionmodel.AvgMatrixSparse{}
 	)
 	mdTrans = &disambig.MDTrans{
 		ParamFunc: paramFunc,
-		UsePOP: app.UsePOP,
+		UsePOP:    app.UsePOP,
 	}
 	disambig.UsePOP = app.UsePOP
 	transitionSystem := transition.TransitionSystem(mdTrans)
@@ -77,9 +77,9 @@ func MorphDisambiguatorInitialize(cmd *commander.Command, args []string) {
 	app.ETokens = serialization.ETokens
 
 	mdTrans = &disambig.MDTrans{
-		ParamFunc: paramFunc,
-		UsePOP: app.UsePOP,
-		POP: app.POP,
+		ParamFunc:   paramFunc,
+		UsePOP:      app.UsePOP,
+		POP:         app.POP,
 		Transitions: app.ETrans,
 	}
 
@@ -87,19 +87,19 @@ func MorphDisambiguatorInitialize(cmd *commander.Command, args []string) {
 	extractor = app.SetupExtractor(featureSetup, []byte("MPL"))
 
 	conf := &disambig.MDConfig{
-		ETokens: app.ETokens,
-		POP: app.POP,
+		ETokens:     app.ETokens,
+		POP:         app.POP,
 		Transitions: app.ETrans,
-		ParamFunc: paramFunc,
+		ParamFunc:   paramFunc,
 	}
 
 	mdBeam = &search.Beam{
-		TransFunc: transitionSystem,
-		FeatExtractor: extractor,
-		Base: conf,
-		Size: app.BeamSize,
-		ConcurrentExec: app.ConcurrentBeam,
-		Transitions: app.ETrans,
+		TransFunc:            transitionSystem,
+		FeatExtractor:        extractor,
+		Base:                 conf,
+		Size:                 app.BeamSize,
+		ConcurrentExec:       app.ConcurrentBeam,
+		Transitions:          app.ETrans,
 		EstimatedTransitions: 1000, // chosen by random dice roll
 	}
 	mdBeam.ShortTempAgenda = true
@@ -109,7 +109,7 @@ func MorphDisambiguatorInitialize(cmd *commander.Command, args []string) {
 func MorphDisambiguateLattices(input string) string {
 	mdLock.Lock()
 	log.Println("Reading ambiguous lattices")
-	log.Println("input:\n ",input)
+	log.Println("input:\n ", input)
 	reader := strings.NewReader(input)
 	lAmb, lAmbE := lattice.Read(reader, 0)
 	if lAmbE != nil {
@@ -121,4 +121,40 @@ func MorphDisambiguateLattices(input string) string {
 	mapping.Write(buf, mappings)
 	mdLock.Unlock()
 	return buf.String()
+}
+
+func RawMorphDisambiguateLattices(input string) [][]nlp.EMorpheme {
+	mdLock.Lock()
+
+	reader := strings.NewReader(input)
+
+	lAmb, lAmbE := lattice.Read(reader, 0)
+	if lAmbE != nil {
+		panic(fmt.Sprintf("Failed reading raw input - %v", lAmbE))
+	}
+
+	predAmbLat := lattice.Lattice2SentenceCorpus(lAmb, app.EWord, app.EPOS, app.EWPOS, app.EMorphProp, app.EMHost, app.EMSuffix)
+	//mappings := app.Parse(predAmbLat, mdBeam)
+
+	parsed := make([][]nlp.EMorpheme, len(predAmbLat))
+
+	for i, instance := range predAmbLat {
+		result, _ := mdBeam.Parse(instance)
+		var row []nlp.EMorpheme
+
+		for _, m := range result.(*disambig.MDConfig).Mappings {
+			if m.Token == nlp.ROOT_TOKEN {
+				continue
+			}
+
+			for _, morph := range m.Spellout {
+				row = append(row, *morph)
+			}
+		}
+
+		parsed[i] = row
+	}
+
+	mdLock.Unlock()
+	return parsed
 }
